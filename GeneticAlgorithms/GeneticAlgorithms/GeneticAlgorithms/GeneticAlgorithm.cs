@@ -8,22 +8,24 @@ namespace GeneticAlgorithms
 {
     public class GeneticAlgorithm
     {
+        Random r;
         private const float POPULATION_SIZE = 25;
 
         public GeneticAlgorithm()
         {
+             r = new Random();
+
             Individual ind = CreateIndividual();
             double fittness = ComputeFitness(ind);
 
             List<Individual> population = InitPopulation();
-
             SelectTwoParents(population);
         }
         private Individual CreateIndividual()
         {
             Individual ind = new Individual();
 
-            Random r = new Random();
+            
             for (int i = 0; i < ind.Value.Length; i++)
             {
                 double value = r.NextDouble();
@@ -47,7 +49,8 @@ namespace GeneticAlgorithms
         {
             int intValue = ind.CalculateFromByteArray();
 
-            //𝑓(𝑥) = −(𝑥^2)+7𝑥            double fitness = -(Math.Pow(intValue, 2)) + 7 * intValue;
+            //𝑓(𝑥) = −(𝑥^2)+7𝑥
+            double fitness = -(Math.Pow(intValue, 2)) + 7 * intValue;
 
             return fitness;
         }
@@ -72,23 +75,50 @@ namespace GeneticAlgorithms
             List<Individual> populationOrderedByRank = population.OrderBy(x => x.Fitness).ToList();
 
             //(6+1)*6/2
-            float sumRank = (population.Count + 1) * population.Count / 2;
+            float sumRank = (population.Count + 1) * (float)population.Count / 2;
+            double worst_probability = (double)2 / (POPULATION_SIZE * (POPULATION_SIZE + 1));
+            double best_probability = (double)POPULATION_SIZE / ((POPULATION_SIZE * (POPULATION_SIZE + 1)) / 2);
 
-            Random r = new Random();
-            var outcome = r.NextDouble(0, sumRank);
-
-            //var index = (outcome - 1) * outcome / 2;
-            float cumProb = 0;
-            //select first parent
-            for (int i = 1; i < population.Count +1; i++)
+            //calculate probability to be chosen and assign to individuals
+            for (int i = 0; i < POPULATION_SIZE; i++)
             {
-                //calculate p
-                float p = (float)i / sumRank;
-                cumProb += p;
-                Console.WriteLine(p);
+                populationOrderedByRank[i].ProbabilityChosen = (i+1) / sumRank;
             }
-            Console.WriteLine("total probability: " + sumprob);
-            return null;
+
+
+
+            //generate random number
+            //father
+            int selectIndFather = r.Next(1, (int)POPULATION_SIZE +1);
+            float selectedProbabilityFather = selectIndFather / sumRank;
+            Individual father = null;
+
+            for (int i = 0; i < POPULATION_SIZE; i++)
+            {
+                if (populationOrderedByRank[i].ProbabilityChosen >= selectedProbabilityFather)
+                {
+                    father = populationOrderedByRank[i];
+                    break;
+                }
+            }
+
+
+            //mother
+            //father
+            int selectIndMother = r.Next(1, (int)POPULATION_SIZE + 1);
+            double selectedProbabilityMother = selectIndMother / sumRank;
+            Individual mother = null;
+
+            for (int i = 0; i < POPULATION_SIZE; i++)
+            {
+                if (populationOrderedByRank[i].ProbabilityChosen >= selectedProbabilityMother)
+                {
+                    mother = populationOrderedByRank[i];
+                    break;
+                }
+            }
+
+            return new Tuple<Individual, Individual>(father, mother);
         }
     }
 }
