@@ -8,8 +8,8 @@ namespace GeneticAlgorithms
 {
     public class GeneticAlgorithm
     {
-        Random r;
-        private const float POPULATION_SIZE = 25;
+        readonly Random r;
+        private const float populationSize = 25;
 
         public GeneticAlgorithm()
         {
@@ -17,9 +17,11 @@ namespace GeneticAlgorithms
 
             Individual ind = CreateIndividual();
             double fittness = ComputeFitness(ind);
+            var mutate = Mutation(ind);
 
             List<Individual> population = InitPopulation();
-            SelectTwoParents(population);
+            var parents = SelectTwoParents(population);
+            var children = CrossOver(parents);
         }
         private Individual CreateIndividual()
         {
@@ -59,7 +61,7 @@ namespace GeneticAlgorithms
         {
             List<Individual> population = new List<Individual>();
 
-            for (int i = 0; i < POPULATION_SIZE; i++)
+            for (int i = 0; i < populationSize; i++)
             {
                 population.Add(CreateIndividual());
             }
@@ -76,24 +78,23 @@ namespace GeneticAlgorithms
 
             //(6+1)*6/2
             float sumRank = (population.Count + 1) * (float)population.Count / 2;
-            double worst_probability = (double)2 / (POPULATION_SIZE * (POPULATION_SIZE + 1));
-            double best_probability = (double)POPULATION_SIZE / ((POPULATION_SIZE * (POPULATION_SIZE + 1)) / 2);
+            double worst_probability = (double)2 / (populationSize * (populationSize + 1));
+            double best_probability = (double)populationSize / ((populationSize * (populationSize + 1)) / 2);
 
             //calculate probability to be chosen and assign to individuals
-            for (int i = 0; i < POPULATION_SIZE; i++)
+            for (int i = 0; i < populationSize; i++)
             {
                 populationOrderedByRank[i].ProbabilityChosen = (i+1) / sumRank;
             }
 
 
-
             //generate random number
             //father
-            int selectIndFather = r.Next(1, (int)POPULATION_SIZE +1);
+            int selectIndFather = r.Next(1, (int)populationSize +1);
             float selectedProbabilityFather = selectIndFather / sumRank;
             Individual father = null;
 
-            for (int i = 0; i < POPULATION_SIZE; i++)
+            for (int i = 0; i < populationSize; i++)
             {
                 if (populationOrderedByRank[i].ProbabilityChosen >= selectedProbabilityFather)
                 {
@@ -105,11 +106,11 @@ namespace GeneticAlgorithms
 
             //mother
             //father
-            int selectIndMother = r.Next(1, (int)POPULATION_SIZE + 1);
+            int selectIndMother = r.Next(1, (int)populationSize + 1);
             double selectedProbabilityMother = selectIndMother / sumRank;
             Individual mother = null;
 
-            for (int i = 0; i < POPULATION_SIZE; i++)
+            for (int i = 0; i < populationSize; i++)
             {
                 if (populationOrderedByRank[i].ProbabilityChosen >= selectedProbabilityMother)
                 {
@@ -119,6 +120,67 @@ namespace GeneticAlgorithms
             }
 
             return new Tuple<Individual, Individual>(father, mother);
+        }
+
+        private Tuple<Individual, Individual> CrossOver(Tuple<Individual, Individual> parents)
+        {
+            const int crossoverThreshold = 90;
+            const int crossoverPoint = 3;
+            double crossoverRate = r.NextDouble();
+
+            if (crossoverRate > crossoverThreshold)
+            {
+                return parents;
+            }
+
+            Individual father = parents.Item1;
+            Individual mother = parents.Item2;
+
+
+            Individual child1 = new Individual();
+            Individual child2 = new Individual();
+
+            for (int i = 0; i < father.Value.Length; i++)
+            {
+                if (i < crossoverPoint)
+                {
+                    child1.Value[i] = father.Value[i];
+                    child2.Value[i] = mother.Value[i];
+                }
+                else
+                {
+                    child1.Value[i] = mother.Value[i];
+                    child2.Value[i] = father.Value[i];
+                }
+            }
+
+            return new Tuple<Individual, Individual>(child1, child2);
+        }
+
+        private Individual Mutation(Individual individual)
+        {
+            const float mutationThreshold = 0.1f;
+
+            for (int i = 0; i < individual.Value.Length; i++)
+            {
+                double mutationRate = r.NextDouble();
+
+                if (mutationRate < mutationThreshold)
+                {
+                    if (individual.Value[i])
+                    {
+                        // if to be mutated value is true
+                        individual.Value[i] = false;
+                    }
+                    else
+                    {
+                        // if to be mutated value is false
+                        individual.Value[i] = true;
+                    }
+                }
+            }
+
+            return individual;
         }
     }
 }

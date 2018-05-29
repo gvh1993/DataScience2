@@ -22,7 +22,7 @@ namespace GeneticAlgorithms
             int totalValue = 0;
             for (int i = Value.Length -1; i > 0; i--)
             {
-                if (Value[i] == true)
+                if (Value[i])
                 {
                     totalValue += (int)Math.Pow(i , 2);
                 }
