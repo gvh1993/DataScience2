@@ -8,10 +8,16 @@ namespace GeneticAlgorithms
 {
     public class GeneticAlgorithm
     {
+        private const float POPULATION_SIZE = 25;
+
         public GeneticAlgorithm()
         {
             Individual ind = CreateIndividual();
             double fittness = ComputeFitness(ind);
+
+            List<Individual> population = InitPopulation();
+
+            SelectTwoParents(population);
         }
         private Individual CreateIndividual()
         {
@@ -31,6 +37,9 @@ namespace GeneticAlgorithms
                 }
             }
 
+            // Fill fittness
+            ind.Fitness = ComputeFitness(ind);
+
             return ind;
         }
 
@@ -43,9 +52,43 @@ namespace GeneticAlgorithms
             return fitness;
         }
 
-        private void SelectTwoParents(List<Individual> population)
+        private List<Individual> InitPopulation()
         {
+            List<Individual> population = new List<Individual>();
 
+            for (int i = 0; i < POPULATION_SIZE; i++)
+            {
+                population.Add(CreateIndividual());
+            }
+
+            return population;
+        }
+
+        private Tuple<Individual, Individual> SelectTwoParents(List<Individual> population)
+        {
+            // RANK SELECTION
+            
+            // order by fitness
+            List<Individual> populationOrderedByRank = population.OrderBy(x => x.Fitness).ToList();
+
+            //(6+1)*6/2
+            float sumRank = (population.Count + 1) * population.Count / 2;
+
+            Random r = new Random();
+            var outcome = r.NextDouble(0, sumRank);
+
+            //var index = (outcome - 1) * outcome / 2;
+            float cumProb = 0;
+            //select first parent
+            for (int i = 1; i < population.Count +1; i++)
+            {
+                //calculate p
+                float p = (float)i / sumRank;
+                cumProb += p;
+                Console.WriteLine(p);
+            }
+            Console.WriteLine("total probability: " + sumprob);
+            return null;
         }
     }
 }

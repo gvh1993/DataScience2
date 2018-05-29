@@ -9,7 +9,7 @@ namespace GeneticAlgorithms
     public class Individual
     {
         public bool[] Value { get; set; }
-        public int Fitness { get; set; }
+        public double Fitness { get; set; }
 
 
         public Individual()
