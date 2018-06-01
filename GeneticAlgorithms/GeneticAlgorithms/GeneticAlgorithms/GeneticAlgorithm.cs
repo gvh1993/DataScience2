@@ -9,21 +9,16 @@ namespace GeneticAlgorithms
     public class GeneticAlgorithm
     {
         readonly Random r;
-        private const float populationSize = 25;
+
+        public float PopulationSize { get;}
 
         public GeneticAlgorithm()
         {
              r = new Random();
 
-            Individual ind = CreateIndividual();
-            double fittness = ComputeFitness(ind);
-            var mutate = Mutation(ind);
-
-            List<Individual> population = InitPopulation();
-            var parents = SelectTwoParents(population);
-            var children = CrossOver(parents);
+            PopulationSize = 25;
         }
-        private Individual CreateIndividual()
+        public Individual CreateIndividual()
         {
             Individual ind = new Individual();
 
@@ -47,7 +42,7 @@ namespace GeneticAlgorithms
             return ind;
         }
 
-        private double ComputeFitness(Individual ind)
+        public double ComputeFitness(Individual ind)
         {
             int intValue = ind.CalculateFromByteArray();
 
@@ -57,11 +52,11 @@ namespace GeneticAlgorithms
             return fitness;
         }
 
-        private List<Individual> InitPopulation()
+        public List<Individual> InitPopulation()
         {
             List<Individual> population = new List<Individual>();
 
-            for (int i = 0; i < populationSize; i++)
+            for (int i = 0; i < PopulationSize; i++)
             {
                 population.Add(CreateIndividual());
             }
@@ -69,7 +64,7 @@ namespace GeneticAlgorithms
             return population;
         }
 
-        private Tuple<Individual, Individual> SelectTwoParents(List<Individual> population)
+        public Tuple<Individual, Individual> SelectTwoParents(List<Individual> population)
         {
             // RANK SELECTION
             
@@ -78,11 +73,11 @@ namespace GeneticAlgorithms
 
             //(6+1)*6/2
             float sumRank = (population.Count + 1) * (float)population.Count / 2;
-            double worst_probability = (double)2 / (populationSize * (populationSize + 1));
-            double best_probability = (double)populationSize / ((populationSize * (populationSize + 1)) / 2);
+            double worst_probability = (double)2 / (PopulationSize * (PopulationSize + 1));
+            double best_probability = (double)PopulationSize / ((PopulationSize * (PopulationSize + 1)) / 2);
 
             //calculate probability to be chosen and assign to individuals
-            for (int i = 0; i < populationSize; i++)
+            for (int i = 0; i < PopulationSize; i++)
             {
                 populationOrderedByRank[i].ProbabilityChosen = (i+1) / sumRank;
             }
@@ -90,11 +85,11 @@ namespace GeneticAlgorithms
 
             //generate random number
             //father
-            int selectIndFather = r.Next(1, (int)populationSize +1);
-            float selectedProbabilityFather = selectIndFather / sumRank;
+            int selectIndFather = r.Next(1, (int)PopulationSize +1);
+            double selectedProbabilityFather = selectIndFather / sumRank;
             Individual father = null;
 
-            for (int i = 0; i < populationSize; i++)
+            for (int i = 0; i < PopulationSize; i++)
             {
                 if (populationOrderedByRank[i].ProbabilityChosen >= selectedProbabilityFather)
                 {
@@ -106,11 +101,11 @@ namespace GeneticAlgorithms
 
             //mother
             //father
-            int selectIndMother = r.Next(1, (int)populationSize + 1);
+            int selectIndMother = r.Next(1, (int)PopulationSize + 1);
             double selectedProbabilityMother = selectIndMother / sumRank;
             Individual mother = null;
 
-            for (int i = 0; i < populationSize; i++)
+            for (int i = 0; i < PopulationSize; i++)
             {
                 if (populationOrderedByRank[i].ProbabilityChosen >= selectedProbabilityMother)
                 {
@@ -119,10 +114,15 @@ namespace GeneticAlgorithms
                 }
             }
 
+            if (father == null || mother == null)
+            {
+                Console.WriteLine("HELP!!");
+            }
+
             return new Tuple<Individual, Individual>(father, mother);
         }
 
-        private Tuple<Individual, Individual> CrossOver(Tuple<Individual, Individual> parents)
+        public Tuple<Individual, Individual> CrossOver(Tuple<Individual, Individual> parents)
         {
             const int crossoverThreshold = 90;
             const int crossoverPoint = 3;
@@ -157,7 +157,7 @@ namespace GeneticAlgorithms
             return new Tuple<Individual, Individual>(child1, child2);
         }
 
-        private Individual Mutation(Individual individual)
+        public Individual Mutation(Individual individual)
         {
             const float mutationThreshold = 0.1f;
 
@@ -181,6 +181,27 @@ namespace GeneticAlgorithms
             }
 
             return individual;
+        }
+
+        public List<Individual> Elitism(List<Individual> population)
+        {
+            // take best 3
+            int topAmount = 3;
+
+            List<Individual> elitePopulation = population.OrderByDescending(x => x.Fitness).Take(topAmount).ToList();
+
+            return elitePopulation;
+        }
+
+        public double CalculateAverageFitness(List<Individual> population)
+        {
+            return population.Average(x => x.Fitness);
+        }
+
+
+        public Individual GetBestIndividual(List<Individual> population)
+        {
+            return population.OrderByDescending(x => x.Fitness).First();
         }
     }
 }
