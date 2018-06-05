@@ -25,11 +25,12 @@ namespace GeneticAlgorithms
                 List<Individual> newPopulation = new List<Individual>();
 
                 //loop 11 times to get 22 individuals
+                // remaining 3 is for elitism
                 for (int j = 0; j < 11; j++)
                 {
                     //selection
-                    var parents = ga.SelectTwoParents(population);
-
+                    //var parents = ga.SelectTwoParents(population);
+                    var parents = ga.Tournament(population);
                     //crossover
                     var offspring = ga.CrossOver(parents);
 

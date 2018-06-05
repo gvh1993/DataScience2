@@ -10,7 +10,7 @@ namespace GeneticAlgorithms
     {
         readonly Random r;
 
-        public float PopulationSize { get;}
+        public int PopulationSize { get;}
 
         public GeneticAlgorithm()
         {
@@ -85,7 +85,7 @@ namespace GeneticAlgorithms
 
             //generate random number
             //father
-            int selectIndFather = r.Next(1, (int)PopulationSize +1);
+            int selectIndFather = r.Next(1, PopulationSize +1);
             double selectedProbabilityFather = selectIndFather / sumRank;
             Individual father = null;
 
@@ -101,7 +101,7 @@ namespace GeneticAlgorithms
 
             //mother
             //father
-            int selectIndMother = r.Next(1, (int)PopulationSize + 1);
+            int selectIndMother = r.Next(1, PopulationSize + 1);
             double selectedProbabilityMother = selectIndMother / sumRank;
             Individual mother = null;
 
@@ -122,6 +122,55 @@ namespace GeneticAlgorithms
             return new Tuple<Individual, Individual>(father, mother);
         }
 
+        public Tuple<Individual, Individual> Tournament(List<Individual> population){
+            Individual father = new Individual();
+            father.Fitness = float.MinValue;
+
+            Individual mother = new Individual();
+            mother.Fitness = float.MinValue;
+
+            // select x amount of potential parents random
+            const int tournamentSize = 5;
+
+            // SELECT FATHER
+            List<Individual> tournamentParticipants = new List<Individual>();
+            for (int i = 0; i < tournamentSize; i++)
+            {
+                var selectedIndex = r.Next(0, PopulationSize);
+                tournamentParticipants.Add(population[selectedIndex]);
+            }
+
+            // fight them by fitness
+            foreach (var potentialParent in tournamentParticipants)
+            {
+                // select parent by best fitness
+                if (father.Fitness < potentialParent.Fitness)
+                {
+                    father = potentialParent;
+                }
+            }
+
+
+            // SELECT MOTHER
+            tournamentParticipants = new List<Individual>();
+            for (int i = 0; i < tournamentSize; i++)
+            {
+                var selectedIndex = r.Next(0, PopulationSize);
+                tournamentParticipants.Add(population[selectedIndex]);
+            }
+
+            // fight them by fitness
+            foreach (var potentialParent in tournamentParticipants)
+            {
+                // select parent by best fitness
+                if (mother.Fitness < potentialParent.Fitness)
+                {
+                    mother = potentialParent;
+                }
+            }
+
+            return new Tuple<Individual, Individual>(father, mother);
+        }
 
         public Tuple<Individual, Individual> CrossOver(Tuple<Individual, Individual> parents)
         {

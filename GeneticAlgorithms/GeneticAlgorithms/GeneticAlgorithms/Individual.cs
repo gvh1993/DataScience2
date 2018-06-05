@@ -22,11 +22,10 @@ namespace GeneticAlgorithms
             int totalValue = 0;
             for (int i = Value.Length -1 ; i >= 0; i--)
             {
-                var bitLocation = (Value.Length - i) - 1;
-                Console.WriteLine(bitLocation);
-
                 if (Value[i])
                 {
+                    var bitLocation = (Value.Length - i) - 1;
+
                     totalValue += (int)Math.Pow(2 , bitLocation);
                 }
             }
