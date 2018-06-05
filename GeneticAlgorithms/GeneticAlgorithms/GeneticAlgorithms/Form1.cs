@@ -55,11 +55,12 @@ namespace GeneticAlgorithms
 
             //show results
             lbl_AverageFitness.Text = "Average fitness: " + ga.CalculateAverageFitness(population);
+            lbl_AmountWithBestFitness.Text = "Amount with best fitness: " + ga.GetAmountWithBestFitness(population);
 
             Individual bestIndividual = ga.GetBestIndividual(population);
             lbl_BestFitness.Text = "Best fitness: " + bestIndividual.Fitness;
             lbl_BestIndividual.Text = "Best individual: " + bestIndividual.ToString();
-
+            
         }
 
         private string CheckInput()

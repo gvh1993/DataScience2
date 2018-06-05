@@ -42,6 +42,7 @@
             this.lbl_AverageFitness = new System.Windows.Forms.Label();
             this.lbl_BestFitness = new System.Windows.Forms.Label();
             this.lbl_BestIndividual = new System.Windows.Forms.Label();
+            this.lbl_AmountWithBestFitness = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btn_Start
@@ -165,17 +166,27 @@
             // lbl_BestIndividual
             // 
             this.lbl_BestIndividual.AutoSize = true;
-            this.lbl_BestIndividual.Location = new System.Drawing.Point(357, 93);
+            this.lbl_BestIndividual.Location = new System.Drawing.Point(357, 112);
             this.lbl_BestIndividual.Name = "lbl_BestIndividual";
             this.lbl_BestIndividual.Size = new System.Drawing.Size(78, 13);
             this.lbl_BestIndividual.TabIndex = 13;
             this.lbl_BestIndividual.Text = "Best individual:";
+            // 
+            // lbl_AmountWithBestFitness
+            // 
+            this.lbl_AmountWithBestFitness.AutoSize = true;
+            this.lbl_AmountWithBestFitness.Location = new System.Drawing.Point(357, 93);
+            this.lbl_AmountWithBestFitness.Name = "lbl_AmountWithBestFitness";
+            this.lbl_AmountWithBestFitness.Size = new System.Drawing.Size(124, 13);
+            this.lbl_AmountWithBestFitness.TabIndex = 14;
+            this.lbl_AmountWithBestFitness.Text = "Amount with best fitness:";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(827, 430);
+            this.Controls.Add(this.lbl_AmountWithBestFitness);
             this.Controls.Add(this.lbl_BestIndividual);
             this.Controls.Add(this.lbl_BestFitness);
             this.Controls.Add(this.lbl_AverageFitness);
@@ -214,6 +225,7 @@
         private System.Windows.Forms.Label lbl_AverageFitness;
         private System.Windows.Forms.Label lbl_BestFitness;
         private System.Windows.Forms.Label lbl_BestIndividual;
+        private System.Windows.Forms.Label lbl_AmountWithBestFitness;
     }
 }
 

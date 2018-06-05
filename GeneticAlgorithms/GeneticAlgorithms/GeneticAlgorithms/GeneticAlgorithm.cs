@@ -137,7 +137,7 @@ namespace GeneticAlgorithms
             mother.Fitness = float.MinValue;
 
             // select x amount of potential parents random
-            const int tournamentSize = 5;
+            const int tournamentSize = 10;
 
             // SELECT FATHER
             List<Individual> tournamentParticipants = new List<Individual>();
@@ -259,11 +259,36 @@ namespace GeneticAlgorithms
             return population.OrderByDescending(x => x.Fitness).First();
         }
 
+        public int GetAmountWithBestFitness(List<Individual> population)
+        {
+            // get the best fitness
+            Individual bestIndividual = GetBestIndividual(population);
+
+            // get list where individual has that fitness
+            return population.Where(x => x.Fitness == bestIndividual.Fitness).Count();
+        }
+
         public List<Individual> StartWithElitism()
         {
             // init population
             List<Individual> population = InitPopulation();
             List<double> fitnessHistory = new List<double>();
+
+            int innerIteration;
+
+            bool populationSizeIsEven;
+            //check if population is even number
+            if (PopulationSize % 2 == 0)
+            {
+                populationSizeIsEven = true;
+                innerIteration = (PopulationSize / 2) -1;
+            }
+            else
+            {
+                populationSizeIsEven = false;
+                innerIteration = Convert.ToInt32(((double)PopulationSize / 2) - 1.5);
+            }
+
 
             for (int i = 0; i < Iterations; i++)
             {
@@ -271,7 +296,7 @@ namespace GeneticAlgorithms
 
                 //loop 11 times to get 22 individuals
                 // remaining 3 is for elitism
-                for (int j = 0; j < 11; j++)
+                for (int j = 0; j < innerIteration; j++)
                 {
                     //selection
                     //var parents = ga.SelectTwoParents(population);
@@ -291,6 +316,11 @@ namespace GeneticAlgorithms
                 }
 
                 //elitism
+                // delete one individual because elitism is 3
+                if (populationSizeIsEven)
+                {
+                    newPopulation.RemoveAt(newPopulation.Count -1);
+                }
                 newPopulation.AddRange(Elitism(population));
 
                 // calculate 
