@@ -122,6 +122,7 @@ namespace GeneticAlgorithms
             return new Tuple<Individual, Individual>(father, mother);
         }
 
+
         public Tuple<Individual, Individual> CrossOver(Tuple<Individual, Individual> parents)
         {
             const int crossoverThreshold = 90;

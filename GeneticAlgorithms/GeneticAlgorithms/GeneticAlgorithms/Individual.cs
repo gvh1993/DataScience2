@@ -20,11 +20,14 @@ namespace GeneticAlgorithms
         public int CalculateFromByteArray()
         {
             int totalValue = 0;
-            for (int i = Value.Length -1; i > 0; i--)
+            for (int i = Value.Length -1 ; i >= 0; i--)
             {
+                var bitLocation = (Value.Length - i) - 1;
+                Console.WriteLine(bitLocation);
+
                 if (Value[i])
                 {
-                    totalValue += (int)Math.Pow(i , 2);
+                    totalValue += (int)Math.Pow(2 , bitLocation);
                 }
             }
 
