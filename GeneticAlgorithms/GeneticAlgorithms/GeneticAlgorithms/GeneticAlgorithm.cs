@@ -11,14 +11,21 @@ namespace GeneticAlgorithms
         readonly Random r;
 
         public int PopulationSize { get;}
+        public int Iterations { get;}
+        public double CrossoverRate { get;}
+        public double MutationRate { get;}
 
-        public GeneticAlgorithm()
+        public GeneticAlgorithm(int populationSize, int iterations, double crossoverRate, double mutationRate)
         {
              r = new Random();
 
-            PopulationSize = 25;
+            PopulationSize = populationSize;
+            Iterations = iterations;
+            CrossoverRate = crossoverRate;
+            MutationRate = mutationRate;
         }
-        public Individual CreateIndividual()
+
+        private Individual CreateIndividual()
         {
             Individual ind = new Individual();
 
@@ -42,7 +49,7 @@ namespace GeneticAlgorithms
             return ind;
         }
 
-        public double ComputeFitness(Individual ind)
+        private double ComputeFitness(Individual ind)
         {
             int intValue = ind.CalculateFromByteArray();
 
@@ -52,7 +59,7 @@ namespace GeneticAlgorithms
             return fitness;
         }
 
-        public List<Individual> InitPopulation()
+        private List<Individual> InitPopulation()
         {
             List<Individual> population = new List<Individual>();
 
@@ -64,7 +71,7 @@ namespace GeneticAlgorithms
             return population;
         }
 
-        public Tuple<Individual, Individual> SelectTwoParents(List<Individual> population)
+        private Tuple<Individual, Individual> SelectTwoParents(List<Individual> population)
         {
             // RANK SELECTION
             
@@ -122,7 +129,7 @@ namespace GeneticAlgorithms
             return new Tuple<Individual, Individual>(father, mother);
         }
 
-        public Tuple<Individual, Individual> Tournament(List<Individual> population){
+        private Tuple<Individual, Individual> Tournament(List<Individual> population){
             Individual father = new Individual();
             father.Fitness = float.MinValue;
 
@@ -172,13 +179,12 @@ namespace GeneticAlgorithms
             return new Tuple<Individual, Individual>(father, mother);
         }
 
-        public Tuple<Individual, Individual> CrossOver(Tuple<Individual, Individual> parents)
+        private Tuple<Individual, Individual> CrossOver(Tuple<Individual, Individual> parents)
         {
-            const int crossoverThreshold = 90;
             const int crossoverPoint = 3;
-            double crossoverRate = r.NextDouble();
+            double randomCrossover = r.NextDouble();
 
-            if (crossoverRate > crossoverThreshold)
+            if (randomCrossover > CrossoverRate)
             {
                 return parents;
             }
@@ -207,15 +213,14 @@ namespace GeneticAlgorithms
             return new Tuple<Individual, Individual>(child1, child2);
         }
 
-        public Individual Mutation(Individual individual)
+        private Individual Mutation(Individual individual)
         {
-            const float mutationThreshold = 0.1f;
 
             for (int i = 0; i < individual.Value.Length; i++)
             {
-                double mutationRate = r.NextDouble();
+                double randomMutation = r.NextDouble();
 
-                if (mutationRate < mutationThreshold)
+                if (randomMutation < MutationRate)
                 {
                     if (individual.Value[i])
                     {
@@ -233,7 +238,7 @@ namespace GeneticAlgorithms
             return individual;
         }
 
-        public List<Individual> Elitism(List<Individual> population)
+        private List<Individual> Elitism(List<Individual> population)
         {
             // take best 3
             int topAmount = 3;
@@ -252,6 +257,122 @@ namespace GeneticAlgorithms
         public Individual GetBestIndividual(List<Individual> population)
         {
             return population.OrderByDescending(x => x.Fitness).First();
+        }
+
+        public List<Individual> StartWithElitism()
+        {
+            // init population
+            List<Individual> population = InitPopulation();
+            List<double> fitnessHistory = new List<double>();
+
+            for (int i = 0; i < Iterations; i++)
+            {
+                List<Individual> newPopulation = new List<Individual>();
+
+                //loop 11 times to get 22 individuals
+                // remaining 3 is for elitism
+                for (int j = 0; j < 11; j++)
+                {
+                    //selection
+                    //var parents = ga.SelectTwoParents(population);
+                    var parents = Tournament(population);
+                    //crossover
+                    var offspring = CrossOver(parents);
+
+                    //mutation
+                    Individual child1 = Mutation(offspring.Item1);
+                    Individual child2 = Mutation(offspring.Item2);
+
+                    child1.Fitness = ComputeFitness(child1);
+                    child2.Fitness = ComputeFitness(child2);
+
+                    newPopulation.Add(child1);
+                    newPopulation.Add(child2);
+                }
+
+                //elitism
+                newPopulation.AddRange(Elitism(population));
+
+                // calculate 
+                var averageFitness = CalculateAverageFitness(newPopulation);
+                var bestIndividual = GetBestIndividual(newPopulation);
+                fitnessHistory.Add(averageFitness);
+
+                // set newpopulation to population
+                population = newPopulation;
+            }
+
+
+            return population;
+        }
+
+        public List<Individual> StartWithoutElitism()
+        {
+            // init population
+            List<Individual> population = InitPopulation();
+            List<double> fitnessHistory = new List<double>();
+
+            int innerIteration;
+
+            bool populationSizeIsEven;
+            //check if population is even number
+            if (PopulationSize % 2 == 0)
+            {
+                populationSizeIsEven = true;
+                innerIteration = PopulationSize / 2;
+            }
+            else
+            {
+                populationSizeIsEven = false;
+                innerIteration = Convert.ToInt32(((double)PopulationSize / 2) + .5);
+            }
+
+
+
+            for (int i = 0; i < Iterations; i++)
+            {
+                List<Individual> newPopulation = new List<Individual>();
+
+                //loop 11 times to get 22 individuals
+                // remaining 3 is for elitism
+                for (int j = 0; j < innerIteration; j++)
+                {
+                    //selection
+                    //var parents = ga.SelectTwoParents(population);
+                    var parents = Tournament(population);
+                    //crossover
+                    var offspring = CrossOver(parents);
+
+                    //mutation
+                    Individual child1 = Mutation(offspring.Item1);
+                    Individual child2 = Mutation(offspring.Item2);
+
+                    child1.Fitness = ComputeFitness(child1);
+                    child2.Fitness = ComputeFitness(child2);
+
+                    newPopulation.Add(child1);
+                    newPopulation.Add(child2);
+                }
+
+                //elitism
+                // there is no elitism selected.. we should remove one of the population if population size is odd
+                if (!populationSizeIsEven)
+                {
+                    newPopulation.RemoveAt(newPopulation.Count -1);
+                }
+                //newPopulation.AddRange(Elitism(population));
+
+                // calculate 
+                var averageFitness = CalculateAverageFitness(newPopulation);
+                var bestIndividual = GetBestIndividual(newPopulation);
+                fitnessHistory.Add(averageFitness);
+
+                // set newpopulation to population
+                population = newPopulation;
+            }
+
+
+            return population;
         }
     }
 }

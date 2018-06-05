@@ -32,5 +32,10 @@ namespace GeneticAlgorithms
 
             return totalValue;
         }
+
+        public override string ToString()
+        {
+            return "\n Genes: " + string.Join(",", Value) + "\n Genes value: " + CalculateFromByteArray() + "\n Fitness: " + Fitness;
+        }  
     }
 }
