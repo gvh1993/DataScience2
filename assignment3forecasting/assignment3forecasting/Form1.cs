@@ -77,7 +77,7 @@ namespace assignment3forecasting
             List<int> forecastData = new List<int>();
             const char DELIMETER = ',';
 
-            using (var reader = new StreamReader("E:/Github/data science/Forecasting/data/data.txt"))
+            using (var reader = new StreamReader("E:/Github/data science/assignment3forecasting/data/data.txt"))
             {
                 //iteration per row
                 while (!reader.EndOfStream)
@@ -123,7 +123,7 @@ namespace assignment3forecasting
         {
             for (int i = 0; i < des.SmoothenedData.Count; i++)
             {
-                chart1.Series["DES"].Points.AddXY(i +2, des.SmoothenedData[i]);
+                chart1.Series["DES"].Points.AddXY(i + 3, des.SmoothenedData[i]);
             }
         }
     }

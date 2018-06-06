@@ -24,7 +24,7 @@ namespace assignment3forecasting
 
         private void ComputeDES()
         {
-            if (alpha == 0.5 && beta == 0.5)
+            if (alpha == 0.33f && beta == 0.37f)
             {
                 Console.WriteLine("test pause");
             }
@@ -59,10 +59,12 @@ namespace assignment3forecasting
                 SmoothenedData.Add(s[i - 1] + b[i - 1]); //
             }
 
+            // extra 1 possible
+            //SmoothenedData.Add(s.Last() + b.Last());
             //forecast
             //𝒇𝒕+𝟏 = 𝒔𝒕 + 𝒃𝒕
             // index 36 - 48
-            for (int i = Demand.Count; i <= Time.Count; i++)
+            for (int i = Demand.Count +1; i <= Time.Count; i++)
             {
                 SmoothenedData.Add(s.Last() + (i - Demand.Count) * b.Last());
             }
@@ -73,7 +75,7 @@ namespace assignment3forecasting
         {
             double error = 0;
 
-            for (int i = 2; i < Demand.Count; i++)//compare index 0 with 2
+            for (int i = 0; i < Demand.Count; i++)//compare index 0 with 2
             {
                 error += Math.Pow(Demand[i] - SmoothenedData[i], 2);
 
