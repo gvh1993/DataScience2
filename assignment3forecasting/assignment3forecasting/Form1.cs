@@ -107,7 +107,7 @@ namespace assignment3forecasting
 
             for (int i = 0; i < ses.Demand.Count; i++)
             {
-                chart1.Series["Data"].Points.AddXY(i + 1, Demand[i]);
+                chart1.Series["Data"].Points.AddXY(i, Demand[i]);
             }
         }
 
@@ -115,7 +115,7 @@ namespace assignment3forecasting
         {
             for (int i = 0; i < ses.SmoothenedData.Count; i++)
             {
-                chart1.Series["SES"].Points.AddXY(i + 1, ses.SmoothenedData[i]);
+                chart1.Series["SES"].Points.AddXY(i, ses.SmoothenedData[i]);
             }
         }
 
@@ -123,7 +123,7 @@ namespace assignment3forecasting
         {
             for (int i = 0; i < des.SmoothenedData.Count; i++)
             {
-                chart1.Series["DES"].Points.AddXY(i + 3, des.SmoothenedData[i]);
+                chart1.Series["DES"].Points.AddXY(i + 2, des.SmoothenedData[i]);
             }
         }
     }
