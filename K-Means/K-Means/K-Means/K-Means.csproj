@@ -54,6 +54,8 @@
     </Compile>
     <Compile Include="KMeans.cs" />
     <Compile Include="Models\Cluster.cs" />
+    <Compile Include="Models\ClientItem.cs" />
+    <Compile Include="Models\WineCluster.cs" />
     <Compile Include="Models\WineItem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

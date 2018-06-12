@@ -10,12 +10,12 @@ namespace K_Means
 {
     public class DataProcessor
     {
-        public List<WineItem> ReadFile()
+        public List<ClientItem> ReadFile()
         {
-            List<WineItem> wineData = new List<WineItem>();
+            List<ClientItem> wineData = new List<ClientItem>();
             const char DELIMETER = ',';
 
-            using (var reader = new StreamReader("D:/Github/DataScience2/K-Means/data/WineData.csv"))
+            using (var reader = new StreamReader("E:/Github/Data Science/K-Means/data/WineData.csv"))
             {
                 //iteration per row
                 while (!reader.EndOfStream)
@@ -35,7 +35,8 @@ namespace K_Means
                         //check if WineItem exist in list<WineItem>
                         if (wineData.ElementAtOrDefault(i) == null)
                         {
-                            WineItem item = new WineItem();
+                            ClientItem item = new ClientItem();
+                            item.ClientId = i+1;
                             item.WineData.Add(wineValue);
                             wineData.Insert(i, item);
                         }

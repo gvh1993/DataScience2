@@ -16,31 +16,60 @@ namespace K_Means
         static void Main()
         {
             DataProcessor dataProcessor = new DataProcessor();
-            List<WineItem> wineData = dataProcessor.ReadFile();
-
-            float sumSquaredError = float.MaxValue;
-            List<Cluster> bestClusters = new List<Cluster>();
+            List<ClientItem> wineData = dataProcessor.ReadFile();
 
             KMeans kMeans = new KMeans(wineData);
+            kMeans.ExecuteKmeans();
+            Console.WriteLine(kMeans.SumSquaredError);
 
-            for (int j = 0; j < 10; j++)
+            // get results (clients)
+            // get results per offer
+
+            List<Cluster> bestCLusters = kMeans.BestClusters;
+
+            // iterate over clusters
+            foreach (var cluster in bestCLusters)
             {
-                List<Cluster> clusters = kMeans.InitiateCentroidBySelection(wineData);
-                for (int i = 0; i < 25; i++)
+                // iterate per client per cluster
+                foreach (var client in cluster.ClientItems)
                 {
-                    clusters = kMeans.AssignToCluster(clusters, wineData);
-                    clusters = kMeans.RecalculateCentroids(clusters);
-                }
-                clusters = kMeans.AssignToCluster(clusters, wineData);
+                    // iteratie per wineItem per client per cluster
+                    for (int i = 0; i < client.WineData.Count; i++)
+                    {
+                        // if wine item is bought
+                        if (client.WineData[i] == 1)
+                        {
+                            //check if WineItem exist in list<WineItem>
+                            if (!cluster.WineItems.Any(x => x.WineOfferId == i+1))
+                            {
+                                WineItem item = new WineItem();
+                                item.WineOfferId = i + 1;
+                                item.ClientsOfferTaken.Add(client);
 
-                float distance = kMeans.CalculateSSE(clusters);
-                if (distance < sumSquaredError)
-                {
-                    sumSquaredError = distance;
-                    bestClusters = clusters;
+                                cluster.WineItems.Add(item);
+                            }
+                            else
+                            {
+                                //append to existing wineItem
+                                try
+                                {
+                                    var myCluster = cluster.WineItems.First(x => x.WineOfferId == i + 1);
+
+                                    myCluster.ClientsOfferTaken.Add(client);
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine(e);
+                                }
+                                
+                                //item.ClientsOfferTaken.Add(client);
+
+                                //wineItems.Add(item);
+                            }
+                        }
+                    }
                 }
             }
-            
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

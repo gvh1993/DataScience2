@@ -8,13 +8,15 @@ namespace K_Means.Models
 {
     public class Cluster
     {
-        public List<WineItem> WineData{ get; set; }
-        public WineItem Centroid { get; set; }
+        public List<ClientItem> ClientItems{ get; set; }
+        public List<WineItem> WineItems { get; set; }
+        public ClientItem Centroid { get; set; }
 
         public Cluster()
         {
-            WineData = new List<WineItem>();
-            Centroid = new WineItem();
+            ClientItems = new List<ClientItem>();
+            Centroid = new ClientItem();
+            WineItems = new List<WineItem>();
         }
     }
 }

@@ -8,12 +8,12 @@ namespace K_Means.Models
 {
     public class WineItem
     {
-        public List<float> WineData { get; set; }
-
+        public int WineOfferId { get; set; }
+        public List<ClientItem> ClientsOfferTaken { get; set; }
 
         public WineItem()
         {
-            WineData = new List<float>();
+            ClientsOfferTaken = new List<ClientItem>();    
         }
     }
 }

@@ -9,21 +9,25 @@ namespace K_Means
 {
     public class KMeans
     {
-        List<WineItem> wineItems = new List<WineItem>();
-        List<Cluster> clusters = new List<Cluster>();
+        const int amountOfKmeans = 100;
+        const int amountOfIterations = 25;
+        const int K = 4;
         int dimension = 0;
 
-        const int K = 5;
-        const int ITERATIONS = 20;
+        private List<ClientItem> wineData = new List<ClientItem>(); // all winedata from the dataprocessor
+        public List<List<Cluster>> ClusterHistory { get; set; }
+        public List<Cluster> BestClusters { get; set; }
+        public float SumSquaredError { get; set; }
 
-        public KMeans(List<WineItem> wineData)
+
+        public KMeans(List<ClientItem> wineData)
         {
-            wineItems = wineData;
+            this.wineData = wineData;
             dimension = wineData[0].WineData.Count;
-
+            
         }
 
-        public List<Cluster> InitiateCentroidBySelection(List<WineItem> wineData)
+        private List<Cluster> InitiateCentroidBySelection(List<ClientItem> wineData)
         {
             Random r = new Random();
 
@@ -42,7 +46,7 @@ namespace K_Means
             return clusters;
         }
 
-        public List<Cluster> InitiateCentroid()
+        private List<Cluster> InitiateCentroid()
         {
             Random r = new Random();
             List<Cluster> clusters = new List<Cluster>();
@@ -51,7 +55,7 @@ namespace K_Means
             {
                 Cluster cluster = new Cluster
                 {
-                    Centroid = new WineItem()
+                    Centroid = new ClientItem()
                 };
 
                 for (int j = 0; j < dimension; j++)
@@ -73,7 +77,7 @@ namespace K_Means
         }
 
         // calculate nearest centroid per wineItem and put it into cluster
-        public List<Cluster> AssignToCluster(List<Cluster> clusters, List<WineItem> wineItems)
+        private List<Cluster> AssignToCluster(List<Cluster> clusters, List<ClientItem> wineItems)
         {
 
             //iterate over wineItems
@@ -97,13 +101,13 @@ namespace K_Means
                     }
                 }
 
-                closestCluster.WineData.Add(wineItem);
+                closestCluster.ClientItems.Add(wineItem);
             }
 
             return clusters;
         }
 
-        public List<Cluster> RecalculateCentroids(List<Cluster> clusters)
+        private List<Cluster> RecalculateCentroids(List<Cluster> clusters)
         {
             List<Cluster> newClusters = new List<Cluster>();
 
@@ -113,14 +117,14 @@ namespace K_Means
             {
                 Cluster newCluster = new Cluster();
 
-                if (cluster.WineData.Count == 0)
+                if (cluster.ClientItems.Count == 0)
                 {
                     newCluster.Centroid = cluster.Centroid;
                 }
                 else
                 {
                     // calculate new location centroid
-                    newCluster.Centroid = CalculateMean(cluster.WineData);
+                    newCluster.Centroid = CalculateMean(cluster.ClientItems);
                 }
 
                 // add cluster to list newclusters
@@ -130,7 +134,7 @@ namespace K_Means
             return newClusters;
         }
 
-        private float CalculateDistance(Cluster cluster, WineItem wineItem)
+        private float CalculateDistance(Cluster cluster, ClientItem wineItem)
         {
             List<float> centroidLocation = cluster.Centroid.WineData;
             List<float> wineItemLocation = wineItem.WineData;
@@ -145,9 +149,9 @@ namespace K_Means
             return (float)distance;
         }
 
-        private WineItem CalculateMean(List<WineItem> wineData)
+        private ClientItem CalculateMean(List<ClientItem> wineData)
         {
-            WineItem newCentroid = new WineItem();
+            ClientItem newCentroid = new ClientItem();
 
             List<float> totalWineData = new List<float>();
 
@@ -183,19 +187,48 @@ namespace K_Means
             
         }
 
-        public float CalculateSSE(List<Cluster> clusters)
+        private float CalculateSSE(List<Cluster> clusters)
         {
             float distance = 0;
 
             foreach (var cluster in clusters)
             {
-                foreach (var wineItem in cluster.WineData)
+                foreach (var wineItem in cluster.ClientItems)
                 {
                     distance += CalculateDistance(cluster, wineItem);
                 }
             }
 
             return distance;
+        }
+
+        public void ExecuteKmeans()
+        {
+            ClusterHistory = new List<List<Cluster>>();
+            BestClusters = new List<Cluster>();
+            SumSquaredError = float.MaxValue;
+
+            for (int j = 0; j < amountOfKmeans; j++)
+            {
+                List<Cluster> clusters = InitiateCentroidBySelection(wineData);
+                for (int i = 0; i < amountOfIterations; i++)
+                {
+                    clusters = AssignToCluster(clusters, wineData);
+                    clusters = RecalculateCentroids(clusters);
+                }
+                clusters = AssignToCluster(clusters, wineData);
+
+                float distance = CalculateSSE(clusters);
+
+                if (distance < SumSquaredError)
+                {
+                    SumSquaredError = distance;
+                    BestClusters = clusters;
+                }
+
+                //add to clustershistory
+                ClusterHistory.Add(clusters);
+            }
         }
     }
 }
